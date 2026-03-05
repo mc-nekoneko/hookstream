@@ -49,12 +49,10 @@ async function handleWebhook(
     if (!valid) return json({ error: "Invalid signature" }, 401);
   }
 
-  // Detect event type from common webhook headers
-  const event =
-    request.headers.get("X-GitHub-Event") ??
-    request.headers.get("X-Gitlab-Event") ??
-    request.headers.get("X-Event-Key") ??
-    "message";
+  // Detect event type from configured header, or default to "message"
+  const event = config.eventHeader
+    ? (request.headers.get(config.eventHeader) ?? "message")
+    : "message";
 
   // Build relay event
   const relayEvent: RelayEvent = {

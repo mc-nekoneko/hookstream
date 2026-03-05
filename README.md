@@ -111,6 +111,7 @@ curl -X POST https://your-worker.workers.dev/admin/channels \
 | `id` | ✅ | Channel name (`a-z0-9-_`, max 64 chars) |
 | `signature` | — | Signature verification config (see below). If omitted, all POST requests are accepted. |
 | `token` | — | Bearer token for SSE access. If omitted, the SSE endpoint is public. |
+| `eventHeader` | — | Header to read the event type from (e.g. `"X-GitHub-Event"`). If omitted, all events are delivered as `"message"`. |
 | `maxHistory` | — | Number of events to replay on reconnect (default: `50`) |
 
 #### `signature` object

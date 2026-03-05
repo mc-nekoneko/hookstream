@@ -63,6 +63,7 @@ export async function handleAdmin(
       id,
       signature,
       token: body.token,
+      eventHeader: body.eventHeader,
       maxHistory: body.maxHistory ?? 50,
       createdAt: new Date().toISOString(),
     };
