@@ -7,16 +7,15 @@ const DEFAULT_MAX_HISTORY = 50;
  * Durable Object that manages SSE connections for a single channel.
  * One instance per channel name.
  */
-export class Channel {
+export class Channel extends CloudflareWorkersModule.DurableObject<Env> {
   private connections = new Set<WritableStreamDefaultWriter<Uint8Array>>();
   private history: RelayEvent[] = [];
   private maxHistory = DEFAULT_MAX_HISTORY;
   private encoder = new TextEncoder();
 
-  constructor(
-    private state: DurableObjectState,
-    // env: Env  (unused for now, kept for future use)
-  ) {}
+  constructor(state: DurableObjectState, env: Env) {
+    super(state, env);
+  }
 
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);

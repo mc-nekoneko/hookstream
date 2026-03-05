@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "types": "wrangler types",
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "check": "biome check ./src",
@@ -12,8 +13,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
-    "@cloudflare/workers-types": "^4.20260305.1",
     "typescript": "^5.9.3",
-    "wrangler": "^3.114.17"
+    "wrangler": "^4.70.0"
   }
 }

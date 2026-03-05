@@ -1,4 +1,4 @@
-import type { ChannelConfig, Env } from "./types";
+import type { ChannelConfig } from "./types";
 
 function json(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), {
@@ -49,7 +49,7 @@ export async function handleAdmin(
   if (request.method === "GET" && parts[0] === "channels" && !parts[1]) {
     const list = await env.CHANNELS_KV.list({ prefix: "channel:" });
     const channels = await Promise.all(
-      list.keys.map(async (k) => {
+      list.keys.map(async (k: { name: string }) => {
         const v = await env.CHANNELS_KV.get(k.name);
         return v ? JSON.parse(v) : null;
       }),

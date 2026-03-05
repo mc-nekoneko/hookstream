@@ -1,8 +1,10 @@
-export type Env = {
-  CHANNEL: DurableObjectNamespace;
-  CHANNELS_KV: KVNamespace;
-  ADMIN_KEY: string;
-};
+// Extend the generated Env (worker-configuration.d.ts) with secrets
+// (secrets are not in wrangler.toml, so wrangler types can't infer them)
+declare global {
+  interface Env {
+    ADMIN_KEY: string;
+  }
+}
 
 export type ChannelConfig = {
   id: string;

@@ -1,6 +1,6 @@
 import { handleAdmin } from "./admin";
 import { extractToken, verifySignature } from "./auth";
-import type { ChannelConfig, Env, RelayEvent } from "./types";
+import type { ChannelConfig, RelayEvent } from "./types";
 
 export { Channel } from "./channel";
 
