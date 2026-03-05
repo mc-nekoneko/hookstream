@@ -1,0 +1,18 @@
+{
+  "name": "hookstream",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "lint": "biome check src",
+    "format": "biome format --write src",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@cloudflare/workers-types": "^4.20260305.1",
+    "typescript": "^5.9.3",
+    "wrangler": "^3.114.17"
+  }
+}

@@ -1,0 +1,21 @@
+name = "hookstream"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[durable_objects.bindings]]
+name = "CHANNEL"
+class_name = "Channel"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["Channel"]
+
+# KV namespace: wrangler kv namespace create CHANNELS_KV
+# then fill in the id below
+[[kv_namespaces]]
+binding = "CHANNELS_KV"
+id = "placeholder"
+
+[vars]
+# ADMIN_KEY: set via `wrangler secret put ADMIN_KEY`
