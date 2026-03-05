@@ -196,19 +196,6 @@ data: {"id":"...","channel":"my-github","event":"push","timestamp":"...","payloa
 
 ---
 
-## Supported Webhook Sources
-
-hookstream is **source-agnostic** — it accepts any HTTP POST with a JSON body. Event type detection is automatic based on common headers:
-
-| Header | Provider |
-|---|---|
-| `X-GitHub-Event` | GitHub |
-| `X-Gitlab-Event` | GitLab |
-| `X-Event-Key` | Bitbucket |
-| *(none)* | Falls back to `"message"` |
-
----
-
 ## Admin API
 
 All admin endpoints require `Authorization: Bearer <ADMIN_KEY>`.
