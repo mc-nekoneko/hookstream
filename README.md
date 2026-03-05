@@ -207,8 +207,6 @@ hookstream is **source-agnostic** — it accepts any HTTP POST with a JSON body.
 | `X-Event-Key` | Bitbucket |
 | *(none)* | Falls back to `"message"` |
 
-Signature verification supports GitHub-style `X-Hub-Signature-256: sha256=<hex>`.
-
 ---
 
 ## Admin API
@@ -220,6 +218,25 @@ All admin endpoints require `Authorization: Bearer <ADMIN_KEY>`.
 | `POST` | `/admin/channels` | Create a channel |
 | `GET` | `/admin/channels` | List all channels |
 | `DELETE` | `/admin/channels/:id` | Delete a channel |
+
+---
+
+## Limitations
+
+hookstream provides **best-effort delivery** and is not a guaranteed message queue. Be aware of the following constraints:
+
+### Connection drops
+Cloudflare may evict a Durable Object instance after a period of inactivity, or during infrastructure events (e.g. restarts, geographic migration). When this happens, all active SSE connections on that channel are dropped.
+
+Browsers using the native `EventSource` API will **automatically reconnect** and send a `Last-Event-ID` header. hookstream will replay missed events from its in-memory ring buffer if the DO instance is still alive. However, if the DO was evicted and restarted, the ring buffer is empty and replay is not possible.
+
+For resilient clients, implement reconnect logic and treat missed events as a known edge case.
+
+### Event loss during eviction
+Events received while the Durable Object is between eviction and reconnection may be lost. This is an inherent trade-off of Cloudflare's serverless execution model.
+
+### In-memory history only
+The ring buffer (`maxHistory`) is held in the DO's memory and is **not persisted**. A DO restart clears the history entirely.
 
 ---
 
