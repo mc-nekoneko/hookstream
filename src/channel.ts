@@ -13,10 +13,6 @@ export class Channel extends CloudflareWorkersModule.DurableObject<Env> {
   private maxHistory = DEFAULT_MAX_HISTORY;
   private encoder = new TextEncoder();
 
-  constructor(state: DurableObjectState, env: Env) {
-    super(state, env);
-  }
-
   async fetch(request: Request): Promise<Response> {
     const url = new URL(request.url);
 
@@ -42,7 +38,10 @@ export class Channel extends CloudflareWorkersModule.DurableObject<Env> {
     lastEventId: string | null,
     signal: AbortSignal,
   ): Response {
-    const { readable, writable } = new TransformStream<Uint8Array, Uint8Array>();
+    const { readable, writable } = new TransformStream<
+      Uint8Array,
+      Uint8Array
+    >();
     const writer = writable.getWriter();
     this.connections.add(writer);
 
