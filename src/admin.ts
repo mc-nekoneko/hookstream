@@ -28,8 +28,8 @@ export async function handleAdmin(
   if (request.method === "POST" && parts[0] === "channels" && !parts[1]) {
     const body = await request.json<Partial<ChannelConfig>>();
     const id = body.id?.trim();
-    if (!id || !/^[a-z0-9-_]{1,64}$/.test(id)) {
-      return json({ error: "Invalid channel id (a-z0-9-_ max 64)" }, 400);
+    if (!id || !/^[a-z0-9_-]{1,64}$/.test(id)) {
+      return json({ error: "Invalid channel id (a-z0-9_- max 64)" }, 400);
     }
     const existing = await env.CHANNELS_KV.get(kvKey(id));
     if (existing) return json({ error: "Channel already exists" }, 409);
