@@ -1,4 +1,4 @@
-import type { ChannelConfig } from "./types";
+import type { ChannelConfig, SignatureConfig } from "./types";
 
 function json(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), {
@@ -34,9 +34,34 @@ export async function handleAdmin(
     const existing = await env.CHANNELS_KV.get(kvKey(id));
     if (existing) return json({ error: "Channel already exists" }, 409);
 
+    // Validate signature config if provided
+    let signature: SignatureConfig | undefined;
+    if (body.signature) {
+      const { header, algorithm, prefix, secret } = body.signature;
+      if (!header || !algorithm || !secret) {
+        return json(
+          { error: "signature requires: header, algorithm, secret" },
+          400,
+        );
+      }
+      if (
+        algorithm !== "hmac-sha256-hex" &&
+        algorithm !== "hmac-sha256-base64"
+      ) {
+        return json(
+          {
+            error:
+              "signature.algorithm must be 'hmac-sha256-hex' or 'hmac-sha256-base64'",
+          },
+          400,
+        );
+      }
+      signature = { header, algorithm, prefix, secret };
+    }
+
     const config: ChannelConfig = {
       id,
-      secret: body.secret,
+      signature,
       token: body.token,
       maxHistory: body.maxHistory ?? 50,
       createdAt: new Date().toISOString(),

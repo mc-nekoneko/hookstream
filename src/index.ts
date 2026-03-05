@@ -35,10 +35,17 @@ async function handleWebhook(
 
   const body = await request.text();
 
-  // Verify signature if secret is configured
-  if (config.secret) {
-    const sigHeader = request.headers.get("X-Hub-Signature-256");
-    const valid = await verifySignature(body, config.secret, sigHeader);
+  // Verify signature if configured
+  if (config.signature) {
+    const { header, secret, algorithm, prefix } = config.signature;
+    const sigHeader = request.headers.get(header);
+    const valid = await verifySignature(
+      body,
+      secret,
+      sigHeader,
+      algorithm,
+      prefix,
+    );
     if (!valid) return json({ error: "Invalid signature" }, 401);
   }
 

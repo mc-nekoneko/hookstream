@@ -6,10 +6,33 @@ declare global {
   }
 }
 
+export type SignatureAlgorithm = "hmac-sha256-hex" | "hmac-sha256-base64";
+
+/**
+ * Signature verification config for incoming webhooks.
+ *
+ * Common provider examples:
+ *
+ * GitHub / GitLab / Bitbucket:
+ *   { header: "X-Hub-Signature-256", algorithm: "hmac-sha256-hex", prefix: "sha256=", secret: "..." }
+ *
+ * Shopify:
+ *   { header: "X-Shopify-Hmac-Sha256", algorithm: "hmac-sha256-base64", secret: "..." }
+ *
+ * Generic HMAC-SHA256 (hex, no prefix):
+ *   { header: "X-My-Signature", algorithm: "hmac-sha256-hex", secret: "..." }
+ */
+export type SignatureConfig = {
+  header: string;
+  algorithm: SignatureAlgorithm;
+  prefix?: string;
+  secret: string;
+};
+
 export type ChannelConfig = {
   id: string;
-  secret?: string; // HMAC-SHA256 webhook signature secret (optional)
-  token?: string; // SSE access token (optional = public)
+  signature?: SignatureConfig; // if omitted, all incoming requests are accepted
+  token?: string; // SSE access token (if omitted, SSE endpoint is public)
   maxHistory: number; // ring buffer size for late-join replay
   createdAt: string;
 };
