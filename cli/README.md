@@ -5,13 +5,24 @@ CLI for managing [hookstream](https://github.com/mc-nekoneko/hookstream) channel
 ## Installation
 
 ```bash
-npm install -g hookstream-cli
+# Clone the repository
+git clone https://github.com/mc-nekoneko/hookstream.git
+cd hookstream/cli
+
+# Install dependencies and build
+npm install
+npm run build
+
+# Register as a global command
+npm link
 ```
 
-Or run without installing:
+After `npm link`, the `hookstream` command is available anywhere in your terminal.
+
+To uninstall:
 
 ```bash
-npx hookstream-cli channels list
+npm unlink -g hookstream-cli
 ```
 
 ## Configuration
