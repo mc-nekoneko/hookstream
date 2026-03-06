@@ -24,7 +24,7 @@ export function loadConfig(): Config {
 
 export function saveConfig(config: Config): void {
   if (!existsSync(CONFIG_DIR)) mkdirSync(CONFIG_DIR, { recursive: true });
-  writeFileSync(CONFIG_FILE, JSON.stringify(config, null, 2) + "\n", "utf-8");
+  writeFileSync(CONFIG_FILE, `${JSON.stringify(config, null, 2)}\n`, "utf-8");
 }
 
 export function getProfile(name = "default"): Profile | undefined {
