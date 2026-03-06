@@ -178,6 +178,69 @@ channels
   });
 
 channels
+  .command("subscribe <id>")
+  .description(
+    "Subscribe to a channel's SSE stream and print events in real-time",
+  )
+  .option("--token <token>", "Bearer token for SSE (if channel requires auth)")
+  .option("--last-event-id <id>", "Resume from a specific event ID")
+  .option("--json", "Output raw JSON per event (one line per event)")
+  .action(
+    async (
+      id: string,
+      opts: { token?: string; lastEventId?: string; json?: boolean },
+    ) => {
+      const client = getClient();
+      const baseUrl =
+        program.opts().url ?? getProfile(program.opts().profile)?.url ?? "";
+
+      if (!opts.json) {
+        console.log(`Subscribing to: ${baseUrl}/${id}/events`);
+        if (opts.lastEventId)
+          console.log(`  Last-Event-ID: ${opts.lastEventId}`);
+        console.log("  Press Ctrl+C to stop\n");
+      }
+
+      const ac = new AbortController();
+      process.on("SIGINT", () => ac.abort());
+      process.on("SIGTERM", () => ac.abort());
+
+      try {
+        await client.subscribe(id, {
+          token: opts.token,
+          lastEventId: opts.lastEventId,
+          signal: ac.signal,
+          onEvent: (event) => {
+            if (opts.json) {
+              console.log(JSON.stringify(event));
+            } else {
+              const time = new Date(event.timestamp).toLocaleTimeString();
+              console.log(`[${time}] event=${event.event} id=${event.id}`);
+              console.log(
+                `  ${JSON.stringify(event.payload, null, 2).split("\n").join("\n  ")}`,
+              );
+              console.log();
+            }
+          },
+          onKeepalive: () => {
+            if (!opts.json) {
+              process.stdout.write(".");
+            }
+          },
+        });
+        if (!opts.json) console.log("\nStream closed.");
+      } catch (err) {
+        if (ac.signal.aborted) {
+          if (!opts.json) console.log("\nDisconnected.");
+        } else {
+          console.error(`Error: ${(err as Error).message}`);
+          process.exit(1);
+        }
+      }
+    },
+  );
+
+channels
   .command("test <id>")
   .description(
     "End-to-end test: subscribe SSE → send test webhook → verify delivery",
