@@ -83,6 +83,7 @@ export class Channel extends DurableObject<Env> {
         "Content-Type": "text/event-stream",
         "Cache-Control": "no-cache",
         "X-Accel-Buffering": "no",
+        "Access-Control-Allow-Origin": "*",
       },
     });
   }
