@@ -94,13 +94,14 @@ curl -X POST https://your-worker.workers.dev/admin/channels \
   -H "Authorization: Bearer $ADMIN_KEY" \
   -H "Content-Type: application/json" \
   -d '{
-    "id": "my-github",
+    "id": "my-channel",
     "signature": {
-      "header": "X-Hub-Signature-256",
+      "header": "X-Webhook-Signature",
       "algorithm": "hmac-sha256-hex",
       "prefix": "sha256=",
       "secret": "your-webhook-secret"
     },
+    "eventHeader": "X-Event-Type",
     "token": "your-sse-token",
     "maxHistory": 50
   }'
@@ -135,36 +136,37 @@ curl -X POST https://your-worker.workers.dev/admin/channels \
 
 ### 3. Configure your webhook source
 
-Point your webhook (GitHub, Stripe, etc.) to:
+Point your webhook source to:
 
 ```
-POST https://your-worker.workers.dev/my-github
+POST https://your-worker.workers.dev/my-channel
 Content-Type: application/json
 ```
 
-For GitHub: go to your repo/org **Settings → Webhooks**, set the URL above and the same secret as `signature.secret`.
+Set the webhook secret on your provider to match `signature.secret`.
 
 ### 4. Subscribe (browser / EventSource)
 
 ```js
 const es = new EventSource(
-  'https://your-worker.workers.dev/my-github/events?token=your-sse-token'
+  'https://your-worker.workers.dev/my-channel/events?token=your-sse-token'
 );
 
-// Listen to specific event types (matches X-GitHub-Event header)
-es.addEventListener('push', e => {
+// With eventHeader configured: listen by event type (value of the configured header)
+es.addEventListener('order.created', e => {
   const event = JSON.parse(e.data);
-  console.log('New push:', event.payload);
+  console.log('New order:', event.payload);
 });
 
-es.addEventListener('pull_request', e => {
+es.addEventListener('payment.succeeded', e => {
   const event = JSON.parse(e.data);
-  console.log('PR event:', event.payload.action);
+  console.log('Payment:', event.payload);
 });
 
-es.addEventListener('workflow_run', e => {
+// Without eventHeader (default): all events arrive as "message"
+es.addEventListener('message', e => {
   const event = JSON.parse(e.data);
-  console.log('CI run:', event.payload.conclusion);
+  console.log('Event received:', event.payload);
 });
 ```
 
@@ -178,7 +180,7 @@ Every SSE message carries the following JSON payload:
 {
   id: string        // UUID, usable as Last-Event-ID for reconnect replay
   channel: string   // Channel name
-  event: string     // Event type (e.g. "push", "pull_request", "workflow_run")
+  event: string     // Event type (value of eventHeader if configured, otherwise "message")
   timestamp: string // ISO 8601
   source?: string   // User-Agent of the webhook sender
   payload: unknown  // Original webhook body (parsed JSON or raw string)
@@ -188,8 +190,8 @@ Every SSE message carries the following JSON payload:
 SSE wire format:
 ```
 id: <uuid>
-event: push
-data: {"id":"...","channel":"my-github","event":"push","timestamp":"...","payload":{...}}
+event: order.created
+data: {"id":"...","channel":"my-channel","event":"order.created","timestamp":"...","payload":{...}}
 
 ```
 
