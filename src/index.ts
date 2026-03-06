@@ -75,7 +75,7 @@ async function handleWebhook(
   await stub.fetch("https://do/broadcast", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(relayEvent),
+    body: JSON.stringify({ event: relayEvent, maxHistory: config.maxHistory }),
   });
 
   return json({ ok: true, id: relayEvent.id });
