@@ -15,3 +15,12 @@ export type ChannelConfig = {
   maxHistory: number;
   createdAt: string;
 };
+
+export type RelayEvent = {
+  id: string;
+  channel: string;
+  event: string;
+  timestamp: string;
+  source?: string;
+  payload: unknown;
+};
