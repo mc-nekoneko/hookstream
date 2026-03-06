@@ -1,3 +1,4 @@
+import { DurableObject } from "cloudflare:workers";
 import type { RelayEvent } from "./types";
 
 const KEEPALIVE_INTERVAL_MS = 15_000;
@@ -7,7 +8,7 @@ const DEFAULT_MAX_HISTORY = 50;
  * Durable Object that manages SSE connections for a single channel.
  * One instance per channel name.
  */
-export class Channel extends CloudflareWorkersModule.DurableObject<Env> {
+export class Channel extends DurableObject<Env> {
   private connections = new Set<WritableStreamDefaultWriter<Uint8Array>>();
   private history: RelayEvent[] = [];
   private maxHistory = DEFAULT_MAX_HISTORY;
