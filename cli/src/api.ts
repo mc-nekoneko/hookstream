@@ -192,4 +192,75 @@ export class HookstreamClient {
       error: `Timeout: event not received within ${timeoutMs}ms`,
     };
   }
+
+  /**
+   * Subscribe to a channel's SSE stream. Calls `onEvent` for each received
+   * event. Returns when the stream closes or `signal` is aborted.
+   */
+  async subscribe(
+    channelId: string,
+    opts: {
+      token?: string;
+      lastEventId?: string;
+      onEvent: (event: RelayEvent) => void;
+      onKeepalive?: () => void;
+      onError?: (error: Error) => void;
+      signal?: AbortSignal;
+    },
+  ): Promise<void> {
+    const sseUrl = `${this.url}/${channelId}/events`;
+    const headers: Record<string, string> = {};
+    if (opts.token) headers.Authorization = `Bearer ${opts.token}`;
+    if (opts.lastEventId) headers["Last-Event-ID"] = opts.lastEventId;
+
+    const res = await fetch(sseUrl, { headers, signal: opts.signal });
+    if (!res.ok) {
+      const body = await res.text().catch(() => "");
+      throw new Error(`SSE connect failed: HTTP ${res.status} ${body}`);
+    }
+
+    const reader = res.body?.getReader();
+    if (!reader) throw new Error("SSE response has no readable body");
+
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    try {
+      while (true) {
+        if (opts.signal?.aborted) break;
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const frames = buffer.split("\n\n");
+        buffer = frames.pop() ?? "";
+
+        for (const frame of frames) {
+          // Keepalive
+          if (frame.trim() === ":keepalive") {
+            opts.onKeepalive?.();
+            continue;
+          }
+
+          const dataLine = frame
+            .split("\n")
+            .find((l) => l.startsWith("data: "));
+          if (!dataLine) continue;
+
+          try {
+            const event = JSON.parse(dataLine.slice(6)) as RelayEvent;
+            opts.onEvent(event);
+          } catch {
+            // skip malformed frames
+          }
+        }
+      }
+    } catch (err) {
+      if (opts.signal?.aborted) return;
+      if (opts.onError) opts.onError(err as Error);
+      else throw err;
+    } finally {
+      reader.cancel().catch(() => {});
+    }
+  }
 }
