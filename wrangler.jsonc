@@ -1,0 +1,34 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "hookstream",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-01-01",
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "CHANNEL",
+        "class_name": "Channel"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_classes": ["Channel"]
+    }
+  ],
+  // KV namespace: wrangler kv namespace create CHANNELS_KV
+  // then fill in the id below
+  "kv_namespaces": [
+    {
+      "binding": "CHANNELS_KV",
+      "id": "placeholder"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  },
+  "vars": {
+    // ADMIN_KEY: set via `wrangler secret put ADMIN_KEY`
+  }
+}
