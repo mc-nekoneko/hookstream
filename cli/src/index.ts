@@ -47,9 +47,9 @@ function getClient(): HookstreamClient {
 program
   .command("configure")
   .description("Save Worker URL and admin key to a config profile")
-  .option("-p, --profile <name>", "Profile name to configure", "default")
-  .action(async (opts: { profile: string }) => {
-    await runConfigure(opts.profile);
+  .action(async () => {
+    const profileName = program.opts<{ profile: string }>().profile;
+    await runConfigure(profileName);
   });
 
 // ─── channels ────────────────────────────────────────────────────────────────
