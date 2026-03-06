@@ -33,6 +33,7 @@ export type ChannelConfig = {
   id: string;
   signature?: SignatureConfig; // if omitted, all incoming requests are accepted
   token?: string; // SSE access token (if omitted, SSE endpoint is public)
+  eventHeader?: string; // header to read event type from (e.g. "X-GitHub-Event")
   maxHistory: number; // ring buffer size for late-join replay
   createdAt: string;
 };
