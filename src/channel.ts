@@ -18,7 +18,11 @@ export class Channel extends CloudflareWorkersModule.DurableObject<Env> {
 
     // Worker → DO: broadcast an event to all SSE clients
     if (request.method === "POST" && url.pathname === "/broadcast") {
-      const event = await request.json<RelayEvent>();
+      const { event, maxHistory } = await request.json<{
+        event: RelayEvent;
+        maxHistory: number;
+      }>();
+      if (maxHistory && maxHistory > 0) this.maxHistory = maxHistory;
       this.history.push(event);
       while (this.history.length > this.maxHistory) this.history.shift();
       await this.broadcast(event);
