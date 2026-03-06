@@ -41,7 +41,7 @@ export type ChannelConfig = {
 export type RelayEvent = {
   id: string;
   channel: string;
-  event: string; // e.g. "push", "pull_request"
+  event: string; // value of eventHeader if configured, otherwise "message"
   timestamp: string;
   source?: string;
   payload: unknown;
