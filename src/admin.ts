@@ -1,10 +1,20 @@
 import type { ChannelConfig, SignatureConfig } from "./types";
 
+type SanitizedConfig = Omit<ChannelConfig, "signature"> & {
+  signature?: Omit<NonNullable<ChannelConfig["signature"]>, "secret">;
+};
+
 function json(data: unknown, status = 200): Response {
   return new Response(JSON.stringify(data), {
     status,
     headers: { "Content-Type": "application/json" },
   });
+}
+
+function sanitizeConfig(config: ChannelConfig): SanitizedConfig {
+  if (!config.signature) return config;
+  const { secret: _secret, ...safeSignature } = config.signature;
+  return { ...config, signature: safeSignature };
 }
 
 function kvKey(channelId: string): string {
@@ -68,7 +78,7 @@ export async function handleAdmin(
       createdAt: new Date().toISOString(),
     };
     await env.CHANNELS_KV.put(kvKey(id), JSON.stringify(config));
-    return json(config, 201);
+    return json(sanitizeConfig(config), 201);
   }
 
   // GET /admin/channels — list channels
@@ -80,7 +90,7 @@ export async function handleAdmin(
         return v ? JSON.parse(v) : null;
       }),
     );
-    return json(channels.filter(Boolean));
+    return json(channels.filter(Boolean).map(sanitizeConfig));
   }
 
   // DELETE /admin/channels/:id — delete channel
