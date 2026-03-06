@@ -16,20 +16,51 @@ npx hookstream-cli channels list
 
 ## Configuration
 
-Set your Worker URL and Admin key via environment variables:
+### Profile-based (recommended)
+
+```bash
+# Configure the default profile
+hookstream configure
+
+# Configure a named profile
+hookstream configure --profile production
+```
+
+Credentials are saved to `~/.config/hookstream-cli/config.json`.
+
+```bash
+# Use default profile
+hookstream channels list
+
+# Use named profile
+hookstream --profile production channels list
+```
+
+### Environment variables
 
 ```bash
 export HOOKSTREAM_URL=https://your-worker.workers.dev
 export HOOKSTREAM_ADMIN_KEY=your-admin-key
 ```
 
-Or pass them as flags on each command:
+### Inline flags
 
 ```bash
 hookstream --url https://your-worker.workers.dev --admin-key your-key channels list
 ```
 
+**Priority:** inline flags > environment variables > profile config
+
 ## Commands
+
+### `configure`
+
+Save Worker URL and admin key to a config profile.
+
+```bash
+hookstream configure                     # default profile
+hookstream configure --profile staging   # named profile
+```
 
 ### `channels list`
 

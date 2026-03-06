@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { Command, InvalidArgumentError } from "commander";
 import { HookstreamClient } from "./api.js";
+import { getProfile, runConfigure } from "./config.js";
 import type { SignatureAlgorithm } from "./types.js";
 
 const program = new Command();
@@ -8,33 +9,48 @@ const program = new Command();
 program
   .name("hookstream")
   .description("CLI for managing hookstream channels")
-  .option(
-    "-u, --url <url>",
-    "Hookstream Worker URL",
-    process.env.HOOKSTREAM_URL,
-  )
-  .option(
-    "-k, --admin-key <key>",
-    "Admin API key",
-    process.env.HOOKSTREAM_ADMIN_KEY,
-  );
+  .option("-p, --profile <name>", "Config profile to use", "default")
+  .option("-u, --url <url>", "Worker URL (overrides profile)")
+  .option("-k, --admin-key <key>", "Admin key (overrides profile)");
 
 function getClient(): HookstreamClient {
-  const opts = program.opts<{ url?: string; adminKey?: string }>();
-  if (!opts.url) {
+  const opts = program.opts<{
+    profile: string;
+    url?: string;
+    adminKey?: string;
+  }>();
+
+  // Priority: flag > env var > profile
+  const url =
+    opts.url ?? process.env.HOOKSTREAM_URL ?? getProfile(opts.profile)?.url;
+  const adminKey =
+    opts.adminKey ??
+    process.env.HOOKSTREAM_ADMIN_KEY ??
+    getProfile(opts.profile)?.adminKey;
+
+  if (!url) {
     console.error(
-      "Error: Worker URL is required (--url or HOOKSTREAM_URL env)",
+      `Error: Worker URL is required.\n  Run: hookstream configure --profile ${opts.profile}`,
     );
     process.exit(1);
   }
-  if (!opts.adminKey) {
+  if (!adminKey) {
     console.error(
-      "Error: Admin key is required (--admin-key or HOOKSTREAM_ADMIN_KEY env)",
+      `Error: Admin key is required.\n  Run: hookstream configure --profile ${opts.profile}`,
     );
     process.exit(1);
   }
-  return new HookstreamClient(opts.url.replace(/\/$/, ""), opts.adminKey);
+  return new HookstreamClient(url.replace(/\/$/, ""), adminKey);
 }
+
+// ─── configure ───────────────────────────────────────────────────────────────
+program
+  .command("configure")
+  .description("Save Worker URL and admin key to a config profile")
+  .option("-p, --profile <name>", "Profile name to configure", "default")
+  .action(async (opts: { profile: string }) => {
+    await runConfigure(opts.profile);
+  });
 
 // ─── channels ────────────────────────────────────────────────────────────────
 const channels = program.command("channels").description("Manage channels");
