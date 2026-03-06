@@ -18,11 +18,19 @@ jobs:
           node-version: "22"
           cache: "npm"
 
-      - name: Install dependencies
+      - name: Install dependencies (worker)
         run: npm ci
 
-      - name: Biome check (lint + format)
+      - name: Install dependencies (cli)
+        run: npm ci
+        working-directory: cli
+
+      - name: Biome check — worker
         run: npm run check
+
+      - name: Biome check — cli
+        run: npm run lint
+        working-directory: cli
 
   build:
     name: Build Check
@@ -35,11 +43,23 @@ jobs:
           node-version: "22"
           cache: "npm"
 
-      - name: Install dependencies
+      - name: Install dependencies (worker)
         run: npm ci
 
-      - name: TypeScript check
+      - name: Install dependencies (cli)
+        run: npm ci
+        working-directory: cli
+
+      - name: TypeScript check — worker
         run: npx tsc --noEmit
+
+      - name: TypeScript check — cli
+        run: npx tsc --noEmit
+        working-directory: cli
+
+      - name: Build — cli
+        run: npm run build
+        working-directory: cli
 
       - name: Wrangler dry-run
         run: npx wrangler deploy --dry-run --outdir dist
