@@ -177,4 +177,56 @@ channels
     }
   });
 
+channels
+  .command("test <id>")
+  .description(
+    "End-to-end test: subscribe SSE → send test webhook → verify delivery",
+  )
+  .option("--token <token>", "Bearer token for SSE (if channel requires auth)")
+  .option(
+    "--timeout <ms>",
+    "Timeout in milliseconds",
+    (v) => {
+      const n = parseInt(v, 10);
+      if (Number.isNaN(n) || n < 1)
+        throw new InvalidArgumentError("Must be a positive integer.");
+      return n;
+    },
+    10_000,
+  )
+  .action(async (id: string, opts: { token?: string; timeout: number }) => {
+    try {
+      const client = getClient();
+      console.log(`Testing channel: ${id}`);
+      console.log(
+        `  SSE:     ${program.opts().url ?? getProfile(program.opts().profile)?.url}/${id}/events`,
+      );
+      console.log(
+        `  Webhook: ${program.opts().url ?? getProfile(program.opts().profile)?.url}/${id}`,
+      );
+      console.log();
+
+      const result = await client.testChannel(id, {
+        token: opts.token,
+        timeoutMs: opts.timeout,
+      });
+
+      if (result.ok) {
+        console.log(`✅ PASS`);
+        console.log(`  Webhook POST:  HTTP ${result.webhookStatus}`);
+        console.log(`  SSE received:  ${result.eventId}`);
+        console.log(`  Round-trip:    ${result.roundTripMs}ms`);
+      } else {
+        console.log(`❌ FAIL`);
+        if (result.webhookStatus)
+          console.log(`  Webhook POST:  HTTP ${result.webhookStatus}`);
+        console.log(`  Error:         ${result.error}`);
+        process.exit(1);
+      }
+    } catch (err) {
+      console.error(`Error: ${(err as Error).message}`);
+      process.exit(1);
+    }
+  });
+
 program.parse();
