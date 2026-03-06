@@ -16,5 +16,8 @@ new_classes = ["Channel"]
 binding = "CHANNELS_KV"
 id = "placeholder"
 
+[observability]
+enabled = true
+
 [vars]
 # ADMIN_KEY: set via `wrangler secret put ADMIN_KEY`
