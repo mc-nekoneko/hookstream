@@ -1,4 +1,4 @@
-import type { ChannelConfig, RelayEvent, SignatureAlgorithm } from "./types.js";
+import type { ChannelConfig, RelayEvent, SignatureAlgorithm } from "./types";
 
 export type CreateChannelInput = {
   id: string;
