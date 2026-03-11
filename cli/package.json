@@ -7,10 +7,11 @@
     "hookstream": "./dist/index.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsup",
     "dev": "tsx src/index.ts",
     "lint": "biome check ./src",
-    "lint:fix": "biome check --write ./src"
+    "lint:fix": "biome check --write ./src",
+    "typecheck": "tsc"
   },
   "dependencies": {
     "commander": "^13.1.0"
@@ -18,6 +19,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.4.6",
     "@types/node": "^22.0.0",
+    "tsup": "^8.0.0",
     "tsx": "^4.19.0",
     "typescript": "^5.8.0"
   }
