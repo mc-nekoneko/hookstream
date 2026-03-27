@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import { Command, InvalidArgumentError } from "commander";
-import { HookstreamClient } from "./api";
-import { getProfile, runConfigure } from "./config";
-import type { SignatureAlgorithm } from "./types";
+import { HookstreamClient } from "./api.js";
+import { getProfile, runConfigure } from "./config.js";
+import type { SignatureAlgorithm } from "./types.js";
 
 const program = new Command();
 

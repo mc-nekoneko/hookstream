@@ -56,5 +56,12 @@ jobs:
           echo "$PACK_OUTPUT"
           echo "$PACK_OUTPUT" | grep -q 'dist/index.js'
 
+      - name: Smoke test packed CLI
+        run: |
+          PACK_FILE=$(npm pack --pack-destination "$RUNNER_TEMP")
+          PREFIX_DIR="$RUNNER_TEMP/prefix"
+          npm install -g "$RUNNER_TEMP/$PACK_FILE" --prefix "$PREFIX_DIR"
+          "$PREFIX_DIR/bin/hookstream" --help >/dev/null
+
       - name: Publish to npm
         run: npm publish
