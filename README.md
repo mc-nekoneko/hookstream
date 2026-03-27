@@ -6,6 +6,19 @@ Receive webhooks from any source (GitHub, Stripe, etc.) and stream them in real 
 
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/mc-nekoneko/hookstream)
 
+## CLI
+
+The official CLI is available on npm:
+
+```bash
+npm install -g @mcnekoneko/hookstream-cli
+```
+
+Use it to configure your worker, create channels, subscribe to SSE streams, and test webhook delivery from your terminal.
+
+- Package: [`@mcnekoneko/hookstream-cli`](https://www.npmjs.com/package/@mcnekoneko/hookstream-cli)
+- CLI docs: [`cli/README.md`](./cli/README.md)
+
 ---
 
 ## Why hookstream?
@@ -89,6 +102,34 @@ npm run deploy
 
 ### 2. Create a channel
 
+#### Option A: use the CLI (recommended)
+
+```bash
+# Configure your worker URL and admin key once
+hookstream configure
+
+# Create a channel
+hookstream channels create \
+  --id my-channel \
+  --token your-sse-token \
+  --event-header X-Event-Type \
+  --max-history 50 \
+  --sig-header X-Webhook-Signature \
+  --sig-algorithm hmac-sha256-hex \
+  --sig-secret your-webhook-secret \
+  --sig-prefix sha256=
+```
+
+You can also inspect or test channels from the terminal:
+
+```bash
+hookstream channels list
+hookstream channels subscribe my-channel --token your-sse-token
+hookstream channels test my-channel --token your-sse-token
+```
+
+#### Option B: call the Admin API directly
+
 ```bash
 curl -X POST https://your-worker.workers.dev/admin/channels \
   -H "Authorization: Bearer $ADMIN_KEY" \
@@ -146,6 +187,13 @@ Content-Type: application/json
 Set the webhook secret on your provider to match `signature.secret`.
 
 ### 4. Subscribe (browser / EventSource)
+
+If you want to inspect events from the terminal first, you can also use:
+
+```bash
+hookstream channels subscribe my-channel --token your-sse-token
+```
+
 
 ```js
 const es = new EventSource(
