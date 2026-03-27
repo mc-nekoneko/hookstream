@@ -5,24 +5,15 @@ CLI for managing [hookstream](https://github.com/mc-nekoneko/hookstream) channel
 ## Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/mc-nekoneko/hookstream.git
-cd hookstream/cli
-
-# Install dependencies and build
-npm install
-npm run build
-
-# Register as a global command
-npm link
+npm install -g @mc-nekoneko/hookstream-cli
 ```
 
-After `npm link`, the `hookstream` command is available anywhere in your terminal.
+After installation, the `hookstream` command is available anywhere in your terminal.
 
 To uninstall:
 
 ```bash
-npm unlink -g hookstream-cli
+npm uninstall -g @mc-nekoneko/hookstream-cli
 ```
 
 ## Configuration
@@ -128,11 +119,50 @@ Delete a channel.
 hookstream channels delete my-channel
 ```
 
+### `channels test <id>`
+
+Open an SSE subscription, send a test webhook, and verify it is received.
+
+```bash
+hookstream channels test my-channel
+hookstream channels test my-channel --token sse-token --timeout 10
+```
+
+### `channels subscribe <id>`
+
+Subscribe to channel events in real time.
+
+```bash
+hookstream channels subscribe my-channel
+hookstream channels subscribe my-channel --token sse-token
+hookstream channels subscribe my-channel --json | jq .
+hookstream channels subscribe my-channel --last-event-id 42
+```
+
+## Releasing
+
+The npm publish workflow lives at `.github/workflows/publish-cli.yml`.
+
+Publishing flow:
+
+1. Bump `cli/package.json` version
+2. Commit and push to GitHub
+3. Create and push a tag in the form `cli-vX.Y.Z`
+
+```bash
+git tag cli-v0.1.0
+git push origin cli-v0.1.0
+```
+
+GitHub Actions will build the CLI and publish it to npm.
+
 ## Development
 
 ```bash
 cd cli
 npm install
 npm run dev -- channels list   # run without building
-npm run build                  # compile to dist/
+npm run lint
+npm run typecheck
+npm run build
 ```
