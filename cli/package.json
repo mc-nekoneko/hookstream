@@ -4,7 +4,7 @@
   "description": "CLI for managing hookstream channels",
   "type": "module",
   "bin": {
-    "hookstream": "./dist/index.js"
+    "hookstream": "dist/index.js"
   },
   "files": [
     "dist",
