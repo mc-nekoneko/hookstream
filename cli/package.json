@@ -1,17 +1,46 @@
 {
-  "name": "hookstream-cli",
+  "name": "@mcnekoneko/hookstream-cli",
   "version": "0.1.0",
   "description": "CLI for managing hookstream channels",
   "type": "module",
   "bin": {
     "hookstream": "./dist/index.js"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
-    "build": "tsup",
+    "build": "tsc",
     "dev": "tsx src/index.ts",
     "lint": "biome check ./src",
     "lint:fix": "biome check --write ./src",
-    "typecheck": "tsc"
+    "typecheck": "tsc --noEmit",
+    "prepack": "npm run build"
+  },
+  "keywords": [
+    "hookstream",
+    "cli",
+    "webhook",
+    "sse",
+    "cloudflare-workers"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/mc-nekoneko/hookstream/tree/main/cli#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mc-nekoneko/hookstream.git",
+    "directory": "cli"
+  },
+  "bugs": {
+    "url": "https://github.com/mc-nekoneko/hookstream/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=20"
   },
   "dependencies": {
     "commander": "^13.1.0"
@@ -19,7 +48,6 @@
   "devDependencies": {
     "@biomejs/biome": "^2.4.6",
     "@types/node": "^22.0.0",
-    "tsup": "^8.0.0",
     "tsx": "^4.19.0",
     "typescript": "^5.8.0"
   }
