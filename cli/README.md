@@ -5,7 +5,7 @@ CLI for managing [hookstream](https://github.com/mc-nekoneko/hookstream) channel
 ## Installation
 
 ```bash
-npm install -g @mc-nekoneko/hookstream-cli
+npm install -g @mcnekoneko/hookstream-cli
 ```
 
 After installation, the `hookstream` command is available anywhere in your terminal.
@@ -13,7 +13,7 @@ After installation, the `hookstream` command is available anywhere in your termi
 To uninstall:
 
 ```bash
-npm uninstall -g @mc-nekoneko/hookstream-cli
+npm uninstall -g @mcnekoneko/hookstream-cli
 ```
 
 ## Configuration

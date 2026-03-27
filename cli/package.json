@@ -1,5 +1,5 @@
 {
-  "name": "@mc-nekoneko/hookstream-cli",
+  "name": "@mcnekoneko/hookstream-cli",
   "version": "0.1.0",
   "description": "CLI for managing hookstream channels",
   "type": "module",
