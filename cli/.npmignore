@@ -1,0 +1,4 @@
+# Prevent npm from inheriting repo-root .gitignore rules (for example `cli/dist/`).
+# The actual publish contents are controlled by package.json#files.
+node_modules
+*.tgz
