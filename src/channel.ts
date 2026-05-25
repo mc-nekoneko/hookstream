@@ -50,12 +50,16 @@ export class Channel extends DurableObject<Env> {
     const writer = writable.getWriter();
     this.connections.add(writer);
 
-    // Send missed events (Last-Event-ID replay)
-    if (lastEventId) {
-      const idx = this.history.findIndex((e) => e.id === lastEventId);
-      const missed = idx >= 0 ? this.history.slice(idx + 1) : this.history;
+    // Send history: replay missed events on reconnect, or full history on fresh connect
+    const toReplay = lastEventId
+      ? (() => {
+          const idx = this.history.findIndex((e) => e.id === lastEventId);
+          return idx >= 0 ? this.history.slice(idx + 1) : this.history;
+        })()
+      : this.history.slice(); // fresh connection → send full history
+    if (toReplay.length > 0) {
       (async () => {
-        for (const ev of missed) {
+        for (const ev of toReplay) {
           await writer.write(this.encoder.encode(this.format(ev)));
         }
       })();
